@@ -1,16 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:yandex_todo/features/task/task_model.dart';
+import 'package:yandex_todo/features/task/util.dart';
 
-class TaskScreen extends StatelessWidget {
+class TaskScreen extends StatefulWidget {
   const TaskScreen({super.key});
 
   @override
+  State<TaskScreen> createState() => _TaskScreenState();
+}
+
+class _TaskScreenState extends State<TaskScreen> {
+  DateTime? due;
+  Importance importance = Importance.lowest;
+  String text = '';
+
+  @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: CustomScrollView(
-        slivers: [TaskAppBar(), TaskEditSliver()],
+    return NotificationListener<UpdateTaskNotification>(
+      onNotification: (notification) {
+        setState(() => switch (notification.data) {
+              DateTime? d => due = d,
+              Importance i => importance = i,
+              String t => text = t,
+              _ => null
+            });
+        return true;
+      },
+      child: TaskModel(
+        due: due,
+        importance: importance,
+        text: text,
+        child: const Scaffold(
+          body: CustomScrollView(
+            slivers: [TaskAppBar(), TaskEditSliver()],
+          ),
+        ),
       ),
     );
   }
+
+  TaskModel updateTask({required TaskModel newTask, required Widget child}) =>
+      TaskModel(
+          due: newTask.due,
+          importance: newTask.importance,
+          text: newTask.text,
+          child: child);
 }
 
 class TaskAppBar extends StatelessWidget {
@@ -29,7 +63,10 @@ class TaskAppBar extends StatelessWidget {
             onPressed: () {},
             child: Text(
               'СОХРАНИТЬ',
-              style: Theme.of(context).textTheme.labelLarge,
+              style: Theme.of(context)
+                  .textTheme
+                  .labelLarge
+                  ?.copyWith(color: Theme.of(context).primaryColor),
             )),
       ],
       pinned: true,
@@ -98,37 +135,103 @@ class _DateTileState extends State<DateTile> {
 
   @override
   Widget build(BuildContext context) {
-    return SwitchListTile(
+    final due = TaskModel.of(context).due;
+    return InkWell(
+      onTap: () => isActive
+          ? showDatePicker(
+              context: context,
+              initialDate: due ?? DateTime.now(),
+              firstDate: DateTime.now(),
+              lastDate: DateTime(2077),
+            ).then((value) => value != null ? _bubbleNotification(value) : null)
+          : null,
+      child: ListTile(
         title: Text(
           'Сделать до',
           style: Theme.of(context).textTheme.titleLarge,
         ),
-        subtitle: const Text(
-          '2 июня 2021',
-          style: TextStyle(color: Colors.blue),
+        subtitle: Text(
+          isActive && due != null ? due.simpleString : '',
+          style: const TextStyle(color: Colors.blue),
         ),
-        value: isActive,
-        onChanged: (value) {
-          setState(() {
-            isActive = value;
-          });
-        });
+        trailing: Switch(
+            value: isActive,
+            onChanged: (value) {
+              setState(() {
+                isActive = value;
+                if (!value) _bubbleNotification(null);
+              });
+            }),
+      ),
+    );
+  }
+
+  _bubbleNotification(DateTime? d) {
+    UpdateTaskNotification(d).dispatch(context);
   }
 }
 
-class ImportanceTile extends StatelessWidget {
+class ImportanceTile extends StatefulWidget {
   const ImportanceTile({
     super.key,
   });
 
   @override
+  State<ImportanceTile> createState() => _ImportanceTileState();
+}
+
+class _ImportanceTileState extends State<ImportanceTile> {
+  @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(
-        'Важность',
-        style: Theme.of(context).textTheme.titleLarge,
+    final MenuController controller = MenuController();
+    final importance = TaskModel.of(context).importance;
+
+    return InkWell(
+      onTap: () => controller.open(),
+      child: ListTile(
+        title: Text(
+          'Важность',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        subtitle: MenuAnchor(
+            controller: controller,
+            menuChildren: [
+              ImportanceMenuButton(
+                importance: Importance.lowest,
+                menuContext: context,
+              ),
+              ImportanceMenuButton(
+                importance: Importance.low,
+                menuContext: context,
+              ),
+              ImportanceMenuButton(
+                importance: Importance.high,
+                menuContext: context,
+              ),
+            ],
+            child: Text(
+              importance.text,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: importance == Importance.high ? Colors.red : null),
+            )),
       ),
-      subtitle: const Text('Нет'),
+    );
+  }
+}
+
+class ImportanceMenuButton extends StatelessWidget {
+  final Importance importance;
+
+  ///Нужно для посылки уведомлений в основное дерево виджетов
+  final BuildContext menuContext;
+  const ImportanceMenuButton(
+      {super.key, required this.importance, required this.menuContext});
+
+  @override
+  Widget build(BuildContext context) {
+    return MenuItemButton(
+      onPressed: () => UpdateTaskNotification(importance).dispatch(menuContext),
+      child: Text(importance.text),
     );
   }
 }

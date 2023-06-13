@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 class CollapseModel extends InheritedWidget {
   final bool isCollapsed;
-
   const CollapseModel(
       {super.key, required this.isCollapsed, required super.child});
 
