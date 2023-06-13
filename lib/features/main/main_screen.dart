@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:yandex_todo/core/data.dart';
+import 'package:yandex_todo/features/task/task_model.dart';
 import 'package:yandex_todo/features/task/task_screen.dart';
 
 import 'state.dart';
@@ -14,32 +16,29 @@ class _MainScreenState extends State<MainScreen> {
   bool isCollapsed = false;
   @override
   Widget build(BuildContext context) {
-    return CollapseModel(
-      isCollapsed: false,
-      child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => const TaskScreen(),
-            ));
-          },
-          backgroundColor: Colors.blue,
-          child: const Icon(
-            Icons.add,
-            color: Colors.white,
-          ),
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => const TaskScreen(),
+          ));
+        },
+        backgroundColor: Colors.blue,
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        body: NotificationListener<CollapseNotification>(
-            onNotification: (notification) {
-              setState(() {
-                isCollapsed = notification.isCollapsed;
-              });
-              return true;
-            },
-            child: CollapseModel(
-                isCollapsed: isCollapsed, child: const MainScrollView())),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      body: NotificationListener<CollapseNotification>(
+          onNotification: (notification) {
+            setState(() {
+              isCollapsed = notification.isCollapsed;
+            });
+            return true;
+          },
+          child: CollapseModel(
+              isCollapsed: isCollapsed, child: const MainScrollView())),
     );
   }
 }
@@ -91,16 +90,27 @@ class MainTaskList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final data = DataModel.maybeOf(context);
+    assert(data != null);
     return SliverToBoxAdapter(
         child: Padding(
       padding: const EdgeInsets.all(8.0),
       child: Card(
-        child: ListView.builder(
-          padding: EdgeInsets.zero,
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          itemCount: 20,
-          itemBuilder: (context, index) => TaskTile(index: index),
+        child: ListenableBuilder(
+          listenable: data!,
+          builder: (context, child) => ListView.builder(
+            padding: EdgeInsets.zero,
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: data.tasks.length,
+            itemBuilder: (context, index) {
+              final t = data.tasks.keys.elementAt(index);
+              return TaskTile(
+                index: t,
+                task: data.tasks[t]!,
+              );
+            },
+          ),
         ),
       ),
     ));
@@ -109,7 +119,8 @@ class MainTaskList extends StatelessWidget {
 
 class TaskTile extends StatelessWidget {
   final int index;
-  const TaskTile({super.key, required this.index});
+  final TaskModel task;
+  const TaskTile({super.key, required this.index, required this.task});
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +145,7 @@ class TaskTile extends StatelessWidget {
       key: ValueKey(index),
       child: ListTile(
         leading: Checkbox(value: false, onChanged: (value) {}),
-        title: const Text('Купить что-то'),
+        title: Text(task.text),
         trailing: IconButton(
             onPressed: () {}, icon: const Icon(Icons.info_outline_rounded)),
       ),
@@ -149,8 +160,13 @@ class CollapsibleAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = context.dependOnInheritedWidgetOfExactType<CollapseModel>();
-    final isCollapsed = model?.isCollapsed ?? false;
+    final collapseModel =
+        context.dependOnInheritedWidgetOfExactType<CollapseModel>();
+    final isCollapsed = collapseModel?.isCollapsed ?? false;
+
+    final dataModel = DataModel.maybeOf(context);
+    assert(dataModel != null);
+    final completed = dataModel!.tasks.values.where((t) => t.completed).length;
 
     return SliverAppBar(
       title: AnimatedSwitcher(
@@ -201,7 +217,7 @@ class CollapsibleAppBar extends StatelessWidget {
                     'Мои дела',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  subtitle: const Text('Выполнено – 5'),
+                  subtitle: Text('Выполнено – $completed'),
                   trailing: const Icon(
                     Icons.visibility_rounded,
                     color: Colors.blue,
