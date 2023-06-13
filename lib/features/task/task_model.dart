@@ -16,12 +16,14 @@ class TaskModel extends InheritedModel<TaskAspect> {
   final DateTime? due;
   final Importance importance;
   final String text;
+  final bool completed;
 
   const TaskModel(
       {super.key,
       required this.due,
       required this.importance,
       required this.text,
+      this.completed = false,
       required super.child});
 
   static TaskModel of(BuildContext context) {
@@ -40,6 +42,13 @@ class TaskModel extends InheritedModel<TaskAspect> {
       dependencies.contains(TaskAspect.importance) &&
           importance != oldWidget.importance ||
       dependencies.contains(TaskAspect.text) && text != oldWidget.text;
+
+  TaskModel switchStatus() => TaskModel(
+      due: due,
+      importance: importance,
+      text: text,
+      completed: !completed,
+      child: child);
 }
 
 class UpdateTaskNotification<T> extends Notification {

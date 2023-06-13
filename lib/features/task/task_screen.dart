@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yandex_todo/core/data.dart';
 import 'package:yandex_todo/features/task/task_model.dart';
 import 'package:yandex_todo/features/task/util.dart';
 
@@ -38,13 +39,6 @@ class _TaskScreenState extends State<TaskScreen> {
       ),
     );
   }
-
-  TaskModel updateTask({required TaskModel newTask, required Widget child}) =>
-      TaskModel(
-          due: newTask.due,
-          importance: newTask.importance,
-          text: newTask.text,
-          child: child);
 }
 
 class TaskAppBar extends StatelessWidget {
@@ -54,13 +48,20 @@ class TaskAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dataModel = DataModel.maybeOf(context);
+    final taskModel = TaskModel.of(context);
+
+    assert(dataModel != null);
     return SliverAppBar(
       leading: IconButton(
           onPressed: () => Navigator.of(context).pop(),
           icon: const Icon(Icons.close)),
       actions: [
         TextButton(
-            onPressed: () {},
+            onPressed: () {
+              dataModel!.addTask(taskModel);
+              Navigator.pop(context);
+            },
             child: Text(
               'СОХРАНИТЬ',
               style: Theme.of(context)
@@ -159,7 +160,11 @@ class _DateTileState extends State<DateTile> {
             onChanged: (value) {
               setState(() {
                 isActive = value;
-                if (!value) _bubbleNotification(null);
+                if (!value) {
+                  _bubbleNotification(null);
+                } else {
+                  _bubbleNotification(DateTime.now());
+                }
               });
             }),
       ),
@@ -247,10 +252,11 @@ class TaskTextField extends StatelessWidget {
       borderRadius: BorderRadius.circular(8),
       clipBehavior: Clip.antiAlias,
       elevation: 2,
-      child: const TextField(
+      child: TextField(
+        onChanged: (value) => _bubbleNotification(value, context),
         minLines: 5,
         maxLines: null,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           filled: true,
           fillColor: Colors.white,
           border: OutlineInputBorder(
@@ -259,5 +265,9 @@ class TaskTextField extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  _bubbleNotification(String t, BuildContext context) {
+    UpdateTaskNotification(t).dispatch(context);
   }
 }
