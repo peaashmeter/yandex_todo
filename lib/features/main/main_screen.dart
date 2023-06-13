@@ -142,16 +142,11 @@ class TaskTile extends StatelessWidget {
   }
 }
 
-class CollapsibleAppBar extends StatefulWidget {
+class CollapsibleAppBar extends StatelessWidget {
   const CollapsibleAppBar({
     super.key,
   });
 
-  @override
-  State<CollapsibleAppBar> createState() => _CollapsibleAppBarState();
-}
-
-class _CollapsibleAppBarState extends State<CollapsibleAppBar> {
   @override
   Widget build(BuildContext context) {
     final model = context.dependOnInheritedWidgetOfExactType<CollapseModel>();
@@ -164,7 +159,12 @@ class _CollapsibleAppBarState extends State<CollapsibleAppBar> {
           child: child,
         ),
         duration: const Duration(milliseconds: 300),
-        child: isCollapsed ? const Text('Мои дела') : null,
+        child: isCollapsed
+            ? Text(
+                'Мои дела',
+                style: Theme.of(context).textTheme.titleLarge,
+              )
+            : null,
       ),
       actions: [
         AnimatedSwitcher(
