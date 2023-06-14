@@ -1,16 +1,8 @@
-# yandex_todo
-
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# Список задач (ШМР 2023)
+Фичи:
+* Можно добавлять задачи
+* Можно удалять задачи
+* Можно редактировать задачи
+* Нельзя сохранять задачи
+* Написано на чистом Flutter без использования сторонних библиотек. **Принципиально**.
+Скачать apk можно [тут](https://github.com/peaashmeter/yandex_todo/releases/download/v1.0.0/app-release.apk).
