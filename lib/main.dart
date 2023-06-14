@@ -1,9 +1,21 @@
+import 'dart:developer';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:yandex_todo/core/data.dart';
 
 import 'features/main/main_screen.dart';
 
 void main() {
+  if (kDebugMode) {
+    FlutterError.onError = (details) =>
+        log(details.exceptionAsString(), stackTrace: details.stack);
+    PlatformDispatcher.instance.onError = (exception, stackTrace) {
+      log(exception.toString(), stackTrace: stackTrace);
+      return false;
+    };
+  }
+
   runApp(const TodoApp());
 }
 
