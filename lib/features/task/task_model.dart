@@ -18,8 +18,11 @@ class TaskModel extends InheritedModel<TaskAspect> {
   final String text;
   final bool completed;
 
+  final int? id;
+
   const TaskModel(
       {super.key,
+      this.id,
       required this.due,
       required this.importance,
       required this.text,

@@ -4,7 +4,10 @@ import 'package:yandex_todo/features/task/task_model.dart';
 import 'package:yandex_todo/features/task/util.dart';
 
 class TaskScreen extends StatefulWidget {
-  const TaskScreen({super.key});
+  ///Если не null, то мы редактируем существующую задачу
+  final int? id;
+  const TaskScreen({super.key}) : id = null;
+  const TaskScreen.edit(int this.id, {super.key});
 
   @override
   State<TaskScreen> createState() => _TaskScreenState();
@@ -14,6 +17,20 @@ class _TaskScreenState extends State<TaskScreen> {
   DateTime? due;
   Importance importance = Importance.lowest;
   String text = '';
+
+  @override
+  void didChangeDependencies() {
+    if (widget.id != null) {
+      final ref = DataModel.maybeOf(context)?.getTasks()[widget.id];
+      if (ref == null) return;
+
+      due = ref.due;
+      importance = ref.importance;
+      text = ref.text;
+    }
+
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +48,7 @@ class _TaskScreenState extends State<TaskScreen> {
         due: due,
         importance: importance,
         text: text,
+        id: widget.id,
         child: const Scaffold(
           body: CustomScrollView(
             slivers: [TaskAppBar(), TaskEditSliver()],
@@ -59,7 +77,10 @@ class TaskAppBar extends StatelessWidget {
       actions: [
         TextButton(
             onPressed: () {
-              dataModel!.addTask(taskModel);
+              taskModel.id == null
+                  ? dataModel!.addTask(
+                      DateTime.timestamp().millisecondsSinceEpoch, taskModel)
+                  : dataModel!.editTask(taskModel.id!, taskModel);
               Navigator.pop(context);
             },
             child: Text(
@@ -109,8 +130,16 @@ class DeleteButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dataModel = DataModel.maybeOf(context)!;
+    final id = TaskModel.of(context).id;
+
     return TextButton.icon(
-        onPressed: () {},
+        onPressed: id == null
+            ? null
+            : () {
+                Navigator.pop(context);
+                dataModel.removeTask(id);
+              },
         icon: const Icon(
           Icons.delete,
           color: Colors.red,
@@ -132,7 +161,15 @@ class DateTile extends StatefulWidget {
 }
 
 class _DateTileState extends State<DateTile> {
-  bool isActive = false;
+  late bool isActive;
+
+  @override
+  void didChangeDependencies() {
+    final due = TaskModel.of(context).due;
+    isActive = due != null;
+
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -248,11 +285,14 @@ class TaskTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final text = TaskModel.of(context).text;
+
     return Material(
       borderRadius: BorderRadius.circular(8),
       clipBehavior: Clip.antiAlias,
       elevation: 2,
-      child: TextField(
+      child: TextFormField(
+        initialValue: text,
         onChanged: (value) => _bubbleNotification(value, context),
         minLines: 5,
         maxLines: null,

@@ -14,6 +14,8 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   bool isCollapsed = false;
+  bool showCompleted = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,16 +32,31 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      body: NotificationListener<CollapseNotification>(
-          onNotification: (notification) {
-            setState(() {
-              isCollapsed = notification.isCollapsed;
-            });
-            return true;
-          },
-          child: CollapseModel(
-              isCollapsed: isCollapsed, child: const MainScrollView())),
+      body: NotificationListener(
+          onNotification: (notification) => switch (notification) {
+                CollapseNotification n => _onCollapseNotification(n),
+                SwitchFilterNotification n => _onSwitchFilterNotification(n),
+                _ => false
+              },
+          child: MainScreenModel(
+              isCollapsed: isCollapsed,
+              showCompleted: showCompleted,
+              child: const MainScrollView())),
     );
+  }
+
+  bool _onCollapseNotification(CollapseNotification notification) {
+    setState(() {
+      isCollapsed = notification.isCollapsed;
+    });
+    return true;
+  }
+
+  bool _onSwitchFilterNotification(SwitchFilterNotification notification) {
+    setState(() {
+      showCompleted = notification.showCompleted;
+    });
+    return true;
   }
 }
 
@@ -90,27 +107,36 @@ class MainTaskList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mainScreenModel =
+        context.dependOnInheritedWidgetOfExactType<MainScreenModel>();
     final data = DataModel.maybeOf(context);
-    assert(data != null);
+    assert(data != null && mainScreenModel != null);
+
+    final predicate =
+        mainScreenModel!.showCompleted ? null : (TaskModel t) => !t.completed;
+
     return SliverToBoxAdapter(
         child: Padding(
       padding: const EdgeInsets.all(8.0),
       child: Card(
         child: ListenableBuilder(
           listenable: data!,
-          builder: (context, child) => ListView.builder(
-            padding: EdgeInsets.zero,
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: data.tasks.length,
-            itemBuilder: (context, index) {
-              final t = data.tasks.keys.elementAt(index);
-              return TaskTile(
-                index: t,
-                task: data.tasks[t]!,
-              );
-            },
-          ),
+          builder: (context, child) {
+            final tasks = data.getTasks(predicate);
+            return ListView.builder(
+              padding: EdgeInsets.zero,
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: tasks.length,
+              itemBuilder: (context, index) {
+                final t = tasks.keys.elementAt(index);
+                return TaskTile(
+                  id: t,
+                  task: tasks[t]!,
+                );
+              },
+            );
+          },
         ),
       ),
     ));
@@ -118,13 +144,24 @@ class MainTaskList extends StatelessWidget {
 }
 
 class TaskTile extends StatelessWidget {
-  final int index;
+  final int id;
   final TaskModel task;
-  const TaskTile({super.key, required this.index, required this.task});
+  const TaskTile({super.key, required this.id, required this.task});
 
   @override
   Widget build(BuildContext context) {
+    final dataModel = DataModel.maybeOf(context);
+    assert(dataModel != null);
+
     return Dismissible(
+      onDismissed: (direction) => _deleteTask(context),
+      confirmDismiss: (direction) async {
+        if (direction == DismissDirection.startToEnd) {
+          _markAsCompleted(context);
+          return false;
+        }
+        return true;
+      },
       background: Container(
         color: Colors.green,
         child: const Padding(
@@ -142,15 +179,25 @@ class TaskTile extends StatelessWidget {
               child: Icon(Icons.delete_rounded)),
         ),
       ),
-      key: ValueKey(index),
+      key: ValueKey(id),
       child: ListTile(
-        leading: Checkbox(value: false, onChanged: (value) {}),
+        leading: Checkbox(
+            value: dataModel!.getTasks()[id]?.completed,
+            onChanged: (value) => _markAsCompleted(context)),
         title: Text(task.text),
         trailing: IconButton(
-            onPressed: () {}, icon: const Icon(Icons.info_outline_rounded)),
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => TaskScreen.edit(id),
+                )),
+            icon: const Icon(Icons.info_outline_rounded)),
       ),
     );
   }
+
+  _deleteTask(BuildContext context) =>
+      DataModel.maybeOf(context)?.removeTask(id);
+  _markAsCompleted(BuildContext context) =>
+      DataModel.maybeOf(context)?.completeTask(id);
 }
 
 class CollapsibleAppBar extends StatelessWidget {
@@ -160,13 +207,14 @@ class CollapsibleAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final collapseModel =
-        context.dependOnInheritedWidgetOfExactType<CollapseModel>();
-    final isCollapsed = collapseModel?.isCollapsed ?? false;
+    final mainScreenModel =
+        context.dependOnInheritedWidgetOfExactType<MainScreenModel>();
+    final isCollapsed = mainScreenModel?.isCollapsed ?? false;
 
     final dataModel = DataModel.maybeOf(context);
     assert(dataModel != null);
-    final completed = dataModel!.tasks.values.where((t) => t.completed).length;
+    final completed =
+        dataModel!.getTasks().values.where((t) => t.completed).length;
 
     return SliverAppBar(
       title: AnimatedSwitcher(
@@ -189,14 +237,7 @@ class CollapsibleAppBar extends StatelessWidget {
             child: child,
           ),
           duration: const Duration(milliseconds: 300),
-          child: isCollapsed
-              ? IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.visibility_rounded,
-                    color: Colors.blue,
-                  ))
-              : null,
+          child: isCollapsed ? const SwitchFilterButton() : null,
         ),
       ],
       expandedHeight: 200,
@@ -218,13 +259,40 @@ class CollapsibleAppBar extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   subtitle: Text('Выполнено – $completed'),
-                  trailing: const Icon(
-                    Icons.visibility_rounded,
-                    color: Colors.blue,
-                  ),
+                  trailing: const SwitchFilterButton(),
                 ),
         ),
       ),
     );
+  }
+}
+
+class SwitchFilterButton extends StatefulWidget {
+  const SwitchFilterButton({
+    super.key,
+  });
+
+  @override
+  State<SwitchFilterButton> createState() => _SwitchFilterButtonState();
+}
+
+class _SwitchFilterButtonState extends State<SwitchFilterButton> {
+  var showCompleted = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+        onPressed: () {
+          setState(() {
+            showCompleted = !showCompleted;
+          });
+          SwitchFilterNotification(showCompleted).dispatch(context);
+        },
+        icon: Icon(
+          showCompleted
+              ? Icons.visibility_rounded
+              : Icons.visibility_off_rounded,
+          color: Colors.blue,
+        ));
   }
 }
