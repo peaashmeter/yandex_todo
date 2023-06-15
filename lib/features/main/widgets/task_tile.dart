@@ -46,7 +46,7 @@ class TaskTile extends StatelessWidget {
             value: dataModel!.getTasks()[id]?.completed,
             onChanged: (value) => _markAsCompleted(context)),
         title: Text(task.text),
-        subtitle: Text(dataModel!.getTasks()[id]?.due?.simpleString ?? ''),
+        subtitle: Text(dataModel.getTasks()[id]?.due?.simpleString ?? ''),
         trailing: IconButton(
             onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => TaskScreen.edit(id),
