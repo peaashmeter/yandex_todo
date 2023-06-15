@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:yandex_todo/core/data.dart';
 import 'package:yandex_todo/features/task/task_model.dart';
 import 'package:yandex_todo/features/task/task_screen.dart';
+import 'package:yandex_todo/core/util.dart';
 
 class TaskTile extends StatelessWidget {
   final int id;
@@ -45,6 +46,7 @@ class TaskTile extends StatelessWidget {
             value: dataModel!.getTasks()[id]?.completed,
             onChanged: (value) => _markAsCompleted(context)),
         title: Text(task.text),
+        subtitle: Text(dataModel!.getTasks()[id]?.due?.simpleString ?? ''),
         trailing: IconButton(
             onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => TaskScreen.edit(id),
