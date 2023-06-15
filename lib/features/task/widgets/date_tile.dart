@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yandex_todo/features/task/util.dart';
+import 'package:yandex_todo/core/util.dart';
 
 import '../task_model.dart';
 
