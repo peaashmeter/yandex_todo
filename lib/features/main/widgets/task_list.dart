@@ -18,7 +18,7 @@ class MainTaskList extends StatelessWidget {
     assert(data != null && mainScreenModel != null);
 
     final predicate =
-        mainScreenModel!.showCompleted ? null : (TaskModel t) => !t.completed;
+        mainScreenModel!.showCompleted ? null : (Task t) => !t.completed;
 
     return SliverToBoxAdapter(
         child: Padding(

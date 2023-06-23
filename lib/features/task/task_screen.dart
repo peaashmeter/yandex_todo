@@ -16,19 +16,14 @@ class TaskScreen extends StatefulWidget {
 }
 
 class _TaskScreenState extends State<TaskScreen> {
-  DateTime? due;
-  Importance importance = Importance.lowest;
-  String text = '';
+  Task task = Task.create();
 
   @override
   void didChangeDependencies() {
     if (widget.id != null) {
-      final ref = DataModel.maybeOf(context)?.getTasks()[widget.id];
+      final ref = DataModel.maybeOf(context)?.getTasks();
       if (ref == null) return;
-
-      due = ref.due;
-      importance = ref.importance;
-      text = ref.text;
+      task = ref[widget.id]!;
     }
 
     super.didChangeDependencies();
@@ -39,18 +34,15 @@ class _TaskScreenState extends State<TaskScreen> {
     return NotificationListener<UpdateTaskNotification>(
       onNotification: (notification) {
         setState(() => switch (notification.data) {
-              DateTime? d => due = d,
-              Importance i => importance = i,
-              String t => text = t,
+              DateTime? d => task = task.copyWith(due: d),
+              Importance i => task = task.copyWith(importance: i),
+              String t => task = task.copyWith(text: t),
               _ => null
             });
         return true;
       },
       child: TaskModel(
-        due: due,
-        importance: importance,
-        text: text,
-        id: widget.id,
+        task: task,
         child: const Scaffold(
           body: CustomScrollView(
             slivers: [TaskAppBar(), TaskEditSliver()],

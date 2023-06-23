@@ -6,7 +6,7 @@ import 'package:yandex_todo/core/util.dart';
 
 class TaskTile extends StatelessWidget {
   final int id;
-  final TaskModel task;
+  final Task task;
   const TaskTile({super.key, required this.id, required this.task});
 
   @override

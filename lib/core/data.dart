@@ -3,34 +3,24 @@ import 'package:yandex_todo/features/task/task_model.dart';
 
 class DataNotifier extends ChangeNotifier {
   ///Map <id: task> для того, чтобы обращаться к задаче за константное время
-  late final Map<int, TaskModel> _tasks;
+  late final Map<int, Task> _tasks;
 
   DataNotifier() {
     ///тестовые данные
     _tasks = {};
-    for (var i = 0; i < 5; i++) {
-      _tasks.addAll({
-        i: TaskModel(
-            id: i,
-            due: DateTime(2024),
-            importance: Importance.low,
-            text: 'Сделать что-то $i',
-            child: const Placeholder())
-      });
-    }
   }
 
-  Map<int, TaskModel> getTasks([bool Function(TaskModel t)? predicate]) =>
+  Map<int, Task> getTasks([bool Function(Task t)? predicate]) =>
       Map.fromEntries(
           _tasks.entries.where((e) => (predicate?.call(e.value) ?? true)));
 
-  void addTask(int id, TaskModel t) {
+  void addTask(int id, Task t) {
     assert(!_tasks.containsKey(id));
     _tasks[id] = t;
     notifyListeners();
   }
 
-  void editTask(int id, TaskModel t) {
+  void editTask(int id, Task t) {
     assert(_tasks.containsKey(id));
     _tasks[id] = t;
     notifyListeners();
@@ -44,7 +34,8 @@ class DataNotifier extends ChangeNotifier {
 
   void completeTask(int id) {
     assert(_tasks.containsKey(id));
-    _tasks[id] = _tasks[id]!.switchStatus();
+    final task = _tasks[id]!;
+    _tasks[id] = task.copyWith(completed: !task.completed);
     notifyListeners();
   }
 }

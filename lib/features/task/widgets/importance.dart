@@ -15,7 +15,7 @@ class _ImportanceTileState extends State<ImportanceTile> {
   @override
   Widget build(BuildContext context) {
     final MenuController controller = MenuController();
-    final importance = TaskModel.of(context).importance;
+    final importance = TaskModel.of(context).task.importance;
 
     return InkWell(
       onTap: () => controller.open(),

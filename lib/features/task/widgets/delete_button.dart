@@ -11,7 +11,7 @@ class DeleteButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dataModel = DataModel.maybeOf(context)!;
-    final id = TaskModel.of(context).id;
+    final id = TaskModel.of(context).task.id;
 
     return TextButton.icon(
         onPressed: id == null
