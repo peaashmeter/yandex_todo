@@ -5,10 +5,8 @@ class DataNotifier extends ChangeNotifier {
   ///Map <id: task> для того, чтобы обращаться к задаче за константное время
   late final Map<int, Task> _tasks;
 
-  DataNotifier() {
-    ///тестовые данные
-    _tasks = {};
-  }
+  ///ревизия с сервера
+  int? revision;
 
   Map<int, Task> getTasks([bool Function(Task t)? predicate]) =>
       Map.fromEntries(
@@ -35,7 +33,7 @@ class DataNotifier extends ChangeNotifier {
   void completeTask(int id) {
     assert(_tasks.containsKey(id));
     final task = _tasks[id]!;
-    _tasks[id] = task.copyWith(completed: !task.completed);
+    _tasks[id] = task.copyWith(completed: !task.done);
     notifyListeners();
   }
 }
