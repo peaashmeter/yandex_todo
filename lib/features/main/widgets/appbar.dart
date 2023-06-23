@@ -17,8 +17,7 @@ class CollapsibleAppBar extends StatelessWidget {
 
     final dataModel = DataModel.maybeOf(context);
     assert(dataModel != null);
-    final completed =
-        dataModel!.getTasks().values.where((t) => t.completed).length;
+    final completed = dataModel!.getTasks().values.where((t) => t.done).length;
 
     return SliverAppBar(
       title: AnimatedSwitcher(

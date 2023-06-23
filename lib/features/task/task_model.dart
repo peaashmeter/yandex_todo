@@ -31,27 +31,45 @@ class UpdateTaskNotification<T> extends Notification {
 }
 
 class Task {
-  final DateTime? due;
+  final DateTime? deadline;
   final Importance importance;
   final String text;
-  final bool completed;
+  final bool done;
   final int? id;
 
   Task(
-      {this.due,
+      {this.deadline,
       required this.importance,
       required this.text,
-      required this.completed,
+      required this.done,
       this.id});
-  Task.create()
-      : this(completed: false, importance: Importance.lowest, text: '');
+  Task.create() : this(done: false, importance: Importance.lowest, text: '');
+
+  Task.fromJson(json)
+      : this(
+            importance: Importance.values[json['importance']],
+            text: json['text'],
+            done: json['done'],
+            deadline: json['deadline'],
+            id: json['id']);
+
+  Map<String, dynamic> toJson() {
+    assert(id != null, 'У задачи должен быть id для публикации на сервер');
+    return {
+      'deadline': deadline?.millisecondsSinceEpoch,
+      'importance': importance.index,
+      'text': text,
+      'done': done,
+      'id': id!
+    };
+  }
 
   Task copyWith(
       {DateTime? due, Importance? importance, String? text, bool? completed}) {
     return Task(
         importance: importance ?? this.importance,
         text: text ?? this.text,
-        completed: completed ?? this.completed,
-        due: due);
+        done: completed ?? this.done,
+        deadline: due);
   }
 }
