@@ -9,7 +9,7 @@
 
 Для компиляции:
 1. создать файл `config.json` в корне проекта
-2. задать в нем `{"token" : "bl"}`
+2. задать в нем `{"token" : <ваш токен>}`
 
 Скачать apk можно [тут](https://github.com/peaashmeter/yandex_todo/releases/download/v1.1.0/app-release.apk).
 
