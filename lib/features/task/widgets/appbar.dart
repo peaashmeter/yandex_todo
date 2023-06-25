@@ -20,10 +20,15 @@ class TaskAppBar extends StatelessWidget {
       actions: [
         TextButton(
             onPressed: () {
-              task.id == null
-                  ? dataModel!.addTask(
-                      DateTime.timestamp().millisecondsSinceEpoch, task)
-                  : dataModel!.editTask(task.id!, task);
+              if (task.id == null) {
+                final id =
+                    DateTime.timestamp().millisecondsSinceEpoch.toString();
+                final t = task.copyWith(id: id);
+                dataModel!.addTask(id, t);
+              } else {
+                dataModel!.editTask(task.id!, task);
+              }
+
               Navigator.pop(context);
             },
             child: Text(

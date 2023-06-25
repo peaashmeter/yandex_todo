@@ -5,7 +5,7 @@ import 'package:yandex_todo/features/task/task_screen.dart';
 import 'package:yandex_todo/core/util.dart';
 
 class TaskTile extends StatelessWidget {
-  final int id;
+  final String id;
   final Task task;
   const TaskTile({super.key, required this.id, required this.task});
 

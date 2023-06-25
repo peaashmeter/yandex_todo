@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 
 enum Importance {
-  lowest('Нет'),
-  low('Низкий'),
-  high('!! Высокий');
+  low('Нет'),
+  basic('Низкий'),
+  important('!! Высокий');
 
   const Importance(this.text);
 
@@ -35,7 +36,7 @@ class Task {
   final Importance importance;
   final String text;
   final bool done;
-  final int? id;
+  final String? id;
 
   Task(
       {this.deadline,
@@ -43,11 +44,11 @@ class Task {
       required this.text,
       required this.done,
       this.id});
-  Task.create() : this(done: false, importance: Importance.lowest, text: '');
+  Task.create() : this(done: false, importance: Importance.low, text: '');
 
   Task.fromJson(json)
       : this(
-            importance: Importance.values[json['importance']],
+            importance: getImportance(json['importance']),
             text: json['text'],
             done: json['done'],
             deadline: json['deadline'],
@@ -57,19 +58,42 @@ class Task {
     assert(id != null, 'У задачи должен быть id для публикации на сервер');
     return {
       'deadline': deadline?.millisecondsSinceEpoch,
-      'importance': importance.index,
+      'importance': importance.name,
       'text': text,
       'done': done,
-      'id': id!
+      'id': id!,
+      'created_at': int.parse(id!),
+      'changed_at': DateTime.timestamp().millisecondsSinceEpoch,
+      'last_updated_by': _getDeviceId()
     };
   }
 
   Task copyWith(
-      {DateTime? due, Importance? importance, String? text, bool? completed}) {
+      {DateTime? due,
+      Importance? importance,
+      String? text,
+      bool? completed,
+      String? id}) {
     return Task(
+        id: id == null ? this.id : id,
         importance: importance ?? this.importance,
         text: text ?? this.text,
         done: completed ?? this.done,
-        deadline: due);
+        deadline: due == null ? this.deadline : due);
   }
+
+  String _getDeviceId() {
+    return Object.hashAll([
+      Platform.localHostname,
+      Platform.localeName,
+      Platform.numberOfProcessors,
+      Platform.operatingSystemVersion
+    ]).toString();
+  }
+
+  static Importance getImportance(String text) => switch (text) {
+        'low' => Importance.low,
+        'basic' => Importance.basic,
+        _ => Importance.important
+      };
 }

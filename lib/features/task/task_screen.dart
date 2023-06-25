@@ -7,9 +7,9 @@ import 'widgets/sliver.dart';
 
 class TaskScreen extends StatefulWidget {
   ///Если не null, то мы редактируем существующую задачу
-  final int? id;
+  final String? id;
   const TaskScreen({super.key}) : id = null;
-  const TaskScreen.edit(int this.id, {super.key});
+  const TaskScreen.edit(this.id, {super.key});
 
   @override
   State<TaskScreen> createState() => _TaskScreenState();

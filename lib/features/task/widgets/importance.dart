@@ -28,22 +28,23 @@ class _ImportanceTileState extends State<ImportanceTile> {
             controller: controller,
             menuChildren: [
               ImportanceMenuButton(
-                importance: Importance.lowest,
-                menuContext: context,
-              ),
-              ImportanceMenuButton(
                 importance: Importance.low,
                 menuContext: context,
               ),
               ImportanceMenuButton(
-                importance: Importance.high,
+                importance: Importance.basic,
+                menuContext: context,
+              ),
+              ImportanceMenuButton(
+                importance: Importance.important,
                 menuContext: context,
               ),
             ],
             child: Text(
               importance.text,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: importance == Importance.high ? Colors.red : null),
+                  color:
+                      importance == Importance.important ? Colors.red : null),
             )),
       ),
     );
