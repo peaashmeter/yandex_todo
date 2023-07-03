@@ -1,21 +1,12 @@
-import 'dart:developer';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:yandex_todo/core/data.dart';
 
 import 'features/main/main_screen.dart';
+import 'core/persistence.dart' as persistence;
 
-void main() {
-  if (kDebugMode) {
-    FlutterError.onError = (details) =>
-        log(details.exceptionAsString(), stackTrace: details.stack);
-    PlatformDispatcher.instance.onError = (exception, stackTrace) {
-      log(exception.toString(), stackTrace: stackTrace);
-      return false;
-    };
-  }
-
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await persistence.init();
   runApp(const TodoApp());
 }
 
@@ -32,7 +23,6 @@ class TodoApp extends StatelessWidget {
           return Center(child: CircularProgressIndicator());
         }
 
-        model.revision = snapshot.data!;
         return DataModel(
           notifier: model,
           child: MaterialApp(
