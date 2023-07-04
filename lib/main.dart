@@ -3,6 +3,7 @@ import 'package:yandex_todo/core/data.dart';
 
 import 'features/main/main_screen.dart';
 import 'core/persistence.dart' as persistence;
+import 'core/network.dart' as network;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +18,7 @@ class TodoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final model = DataNotifier();
     return FutureBuilder(
-      future: model.init(),
+      future: model.init(network.listTasks, persistence.readTasks),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Center(child: CircularProgressIndicator());

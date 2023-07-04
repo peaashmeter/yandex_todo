@@ -14,9 +14,10 @@ class DataNotifier extends ChangeNotifier {
       Map.fromEntries(
           _tasks.entries.where((e) => (predicate?.call(e.value) ?? true)));
 
-  Future<int> init() async {
-    final remoteData = await net.listTasks();
-    final localData = await local.readTasks();
+  Future<int> init(Future<(int, List<Task>)?> Function() getRemoteTasks,
+      Future<(int, List<Task>)?> Function() getLocalTasks) async {
+    final remoteData = await getRemoteTasks();
+    final localData = await getLocalTasks();
 
     if (localData != null) {
       final localRev = localData.$1;

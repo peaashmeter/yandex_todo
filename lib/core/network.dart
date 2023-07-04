@@ -52,7 +52,7 @@ Future<(int, List<Task>)?> updateTasks(List<Task> tasks, int revision) async {
   }
 }
 
-Future<(int, Task)?> getTaskbyId(String id) async {
+Future<(int, Task)?> getTaskById(String id) async {
   final client = HttpClient();
   final url = baseurl.replace(path: 'todobackend/list/$id');
   try {

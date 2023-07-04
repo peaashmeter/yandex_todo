@@ -27,7 +27,7 @@ Future<bool> init() async {
     _storage = File('${dir.path}/tasks.json');
 
     if (!await _storage!.exists() || _storage!.readAsBytesSync().isEmpty) {
-      await _storage!.create();
+      await _storage!.create(recursive: true);
       final initialData = {
         'revision': 0,
         'list': [],
