@@ -5,8 +5,8 @@ import 'package:yandex_todo/features/task/task_screen.dart';
 import 'package:yandex_todo/core/util.dart';
 
 class TaskTile extends StatelessWidget {
-  final int id;
-  final TaskModel task;
+  final String id;
+  final Task task;
   const TaskTile({super.key, required this.id, required this.task});
 
   @override
@@ -43,10 +43,10 @@ class TaskTile extends StatelessWidget {
       key: ValueKey(id),
       child: ListTile(
         leading: Checkbox(
-            value: dataModel!.getTasks()[id]?.completed,
+            value: dataModel!.getTasks()[id]?.done,
             onChanged: (value) => _markAsCompleted(context)),
         title: Text(task.text),
-        subtitle: Text(dataModel.getTasks()[id]?.due?.simpleString ?? ''),
+        subtitle: Text(dataModel.getTasks()[id]?.deadline?.simpleString ?? ''),
         trailing: IconButton(
             onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => TaskScreen.edit(id),

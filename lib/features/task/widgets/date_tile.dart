@@ -17,7 +17,7 @@ class _DateTileState extends State<DateTile> {
 
   @override
   void didChangeDependencies() {
-    final due = TaskModel.of(context).due;
+    final due = TaskModel.of(context).task.deadline;
     isActive = due != null;
 
     super.didChangeDependencies();
@@ -25,7 +25,7 @@ class _DateTileState extends State<DateTile> {
 
   @override
   Widget build(BuildContext context) {
-    final due = TaskModel.of(context).due;
+    final due = TaskModel.of(context).task.deadline;
     return InkWell(
       onTap: () => isActive
           ? showDatePicker(

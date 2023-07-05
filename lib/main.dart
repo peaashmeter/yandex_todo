@@ -24,22 +24,33 @@ class TodoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DataModel(
-      notifier: DataNotifier(),
-      child: MaterialApp(
-        theme: ThemeData(
-            primaryColor: Colors.blue,
-            appBarTheme: const AppBarTheme(
-                color: Color(0xFFF7F6F2),
-                titleTextStyle: TextStyle(color: Colors.black),
-                foregroundColor: Colors.black),
-            textTheme: const TextTheme(
-                labelLarge: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600))),
-        home: const MainScreen(),
-      ),
+    final model = DataNotifier();
+    return FutureBuilder(
+      future: model.init(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        model.revision = snapshot.data!;
+        return DataModel(
+          notifier: model,
+          child: MaterialApp(
+            theme: ThemeData(
+                primaryColor: Colors.blue,
+                appBarTheme: const AppBarTheme(
+                    color: Color(0xFFF7F6F2),
+                    titleTextStyle: TextStyle(color: Colors.black),
+                    foregroundColor: Colors.black),
+                textTheme: const TextTheme(
+                    labelLarge: TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600))),
+            home: const MainScreen(),
+          ),
+        );
+      },
     );
   }
 }

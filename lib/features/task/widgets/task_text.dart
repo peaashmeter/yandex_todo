@@ -9,7 +9,7 @@ class TaskTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = TaskModel.of(context).text;
+    final text = TaskModel.of(context).task.text;
 
     return Material(
       borderRadius: BorderRadius.circular(8),

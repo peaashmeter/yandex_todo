@@ -1,57 +1,27 @@
 import 'package:flutter/material.dart';
-
-enum TaskAspect { due, importance, text }
+import 'dart:io';
 
 enum Importance {
-  lowest('Нет'),
-  low('Низкий'),
-  high('!! Высокий');
+  low('Нет'),
+  basic('Низкий'),
+  important('!! Высокий');
 
   const Importance(this.text);
 
   final String text;
 }
 
-class TaskModel extends InheritedModel<TaskAspect> {
-  final DateTime? due;
-  final Importance importance;
-  final String text;
-  final bool completed;
-
-  final int? id;
-
-  const TaskModel(
-      {super.key,
-      this.id,
-      required this.due,
-      required this.importance,
-      required this.text,
-      this.completed = false,
-      required super.child});
+class TaskModel extends InheritedWidget {
+  final Task task;
+  const TaskModel({super.key, required this.task, required super.child});
 
   static TaskModel of(BuildContext context) {
-    final t = InheritedModel.inheritFrom<TaskModel>(context);
-    assert(t is TaskModel, throw TypeError());
+    final t = context.dependOnInheritedWidgetOfExactType<TaskModel>();
     return t!;
   }
 
   @override
-  bool updateShouldNotify(TaskModel oldWidget) => this != oldWidget;
-
-  @override
-  bool updateShouldNotifyDependent(
-          TaskModel oldWidget, Set<TaskAspect> dependencies) =>
-      dependencies.contains(TaskAspect.due) && due != oldWidget.due ||
-      dependencies.contains(TaskAspect.importance) &&
-          importance != oldWidget.importance ||
-      dependencies.contains(TaskAspect.text) && text != oldWidget.text;
-
-  TaskModel switchStatus() => TaskModel(
-      due: due,
-      importance: importance,
-      text: text,
-      completed: !completed,
-      child: child);
+  bool updateShouldNotify(TaskModel oldWidget) => task != oldWidget.task;
 }
 
 class UpdateTaskNotification<T> extends Notification {
@@ -59,4 +29,71 @@ class UpdateTaskNotification<T> extends Notification {
 
   UpdateTaskNotification(this._data);
   get data => _data;
+}
+
+class Task {
+  final DateTime? deadline;
+  final Importance importance;
+  final String text;
+  final bool done;
+  final String? id;
+
+  Task(
+      {this.deadline,
+      required this.importance,
+      required this.text,
+      required this.done,
+      this.id});
+  Task.create() : this(done: false, importance: Importance.low, text: '');
+
+  Task.fromJson(json)
+      : this(
+            importance: getImportance(json['importance']),
+            text: json['text'],
+            done: json['done'],
+            deadline: json['deadline'],
+            id: json['id']);
+
+  Map<String, dynamic> toJson() {
+    assert(id != null, 'У задачи должен быть id для публикации на сервер');
+    return {
+      'deadline': deadline?.millisecondsSinceEpoch,
+      'importance': importance.name,
+      'text': text,
+      'done': done,
+      'id': id!,
+      'created_at': int.parse(id!),
+      'changed_at': DateTime.timestamp().millisecondsSinceEpoch,
+      'last_updated_by': _getDeviceId()
+    };
+  }
+
+  Task copyWith(
+      {DateTime? due,
+      Importance? importance,
+      String? text,
+      bool? completed,
+      String? id}) {
+    return Task(
+        id: id == null ? this.id : id,
+        importance: importance ?? this.importance,
+        text: text ?? this.text,
+        done: completed ?? this.done,
+        deadline: due == null ? this.deadline : due);
+  }
+
+  String _getDeviceId() {
+    return Object.hashAll([
+      Platform.localHostname,
+      Platform.localeName,
+      Platform.numberOfProcessors,
+      Platform.operatingSystemVersion
+    ]).toString();
+  }
+
+  static Importance getImportance(String text) => switch (text) {
+        'low' => Importance.low,
+        'basic' => Importance.basic,
+        _ => Importance.important
+      };
 }

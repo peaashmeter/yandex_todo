@@ -10,7 +10,7 @@ class TaskAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dataModel = DataModel.maybeOf(context);
-    final taskModel = TaskModel.of(context);
+    final task = TaskModel.of(context).task;
 
     assert(dataModel != null);
     return SliverAppBar(
@@ -20,10 +20,15 @@ class TaskAppBar extends StatelessWidget {
       actions: [
         TextButton(
             onPressed: () {
-              taskModel.id == null
-                  ? dataModel!.addTask(
-                      DateTime.timestamp().millisecondsSinceEpoch, taskModel)
-                  : dataModel!.editTask(taskModel.id!, taskModel);
+              if (task.id == null) {
+                final id =
+                    DateTime.timestamp().millisecondsSinceEpoch.toString();
+                final t = task.copyWith(id: id);
+                dataModel!.addTask(id, t);
+              } else {
+                dataModel!.editTask(task.id!, task);
+              }
+
               Navigator.pop(context);
             },
             child: Text(
