@@ -20,8 +20,8 @@ class DataNotifier extends ChangeNotifier {
     final localData = await getLocalTasks();
 
     if (localData != null) {
-      final localRev = localData.$1;
-      final localTasks = localData.$2;
+      var localRev = localData.$1;
+      var localTasks = localData.$2;
 
       if (remoteData != null) {
         final remoteRev = remoteData.$1;
@@ -29,8 +29,11 @@ class DataNotifier extends ChangeNotifier {
           await net.updateTasks(localTasks, localRev);
         } else {
           await local.updateTasks(remoteData.$2, remoteData.$1);
+          localRev = remoteData.$1;
+          localTasks = remoteData.$2;
         }
       }
+
       _tasks = Map.fromIterable(localTasks, key: (t) => t.id, value: (t) => t);
 
       revision = localRev;
@@ -52,9 +55,8 @@ class DataNotifier extends ChangeNotifier {
     assert(!_tasks.containsKey(id));
     _tasks[id] = t;
     assert(revision != null);
-    revision = revision! + 1;
+    revision = await net.addTask(t, revision!);
     await local.updateTasks(_tasks.values, revision!);
-    await net.addTask(t, revision!);
     notifyListeners();
   }
 
@@ -62,9 +64,8 @@ class DataNotifier extends ChangeNotifier {
     assert(_tasks.containsKey(id));
     _tasks[id] = t;
     assert(revision != null);
-    revision = revision! + 1;
+    revision = await net.updateTask(t, revision!);
     await local.updateTasks(_tasks.values, revision!);
-    await net.updateTask(t, revision!);
     notifyListeners();
   }
 
@@ -72,9 +73,8 @@ class DataNotifier extends ChangeNotifier {
     assert(_tasks.containsKey(id));
     _tasks.remove(id);
     assert(revision != null);
-    revision = revision! + 1;
+    revision = await net.deleteTask(id, revision!);
     await local.updateTasks(_tasks.values, revision!);
-    await net.deleteTask(id, revision!);
     notifyListeners();
   }
 
@@ -83,9 +83,8 @@ class DataNotifier extends ChangeNotifier {
     final task = _tasks[id]!;
     _tasks[id] = task.copyWith(completed: !task.done);
     assert(revision != null);
-    revision = revision! + 1;
+    revision = await net.updateTask(_tasks[id]!, revision!);
     await local.updateTasks(_tasks.values, revision!);
-    await net.updateTask(_tasks[id]!, revision!);
     notifyListeners();
   }
 }
