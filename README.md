@@ -30,7 +30,7 @@ Use '42' as id when needed.
 ```
 Важно объяснить нейросети про то, как работают Records, она про них еще не знает.
 
-Скачать apk можно [тут](https://github.com/peaashmeter/yandex_todo/releases/download/v1.1.0/app-release.apk).
+Скачать apk можно [тут](https://github.com/peaashmeter/yandex_todo/releases/download/v1.2.0/app-release.apk).
 
 | <img src="https://github.com/peaashmeter/yandex_todo/blob/main/screenshots/1.png" width="300">  |  <img src="https://github.com/peaashmeter/yandex_todo/blob/main/screenshots/2.png" width="300"> |
 |:-:|---|
