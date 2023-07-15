@@ -9,7 +9,6 @@
 Для запуска:
 1. создать файл `config.json` в корне проекта
 2. задать в нем `{"token" : <ваш токен>}`
-3. `flutter run --dart-define-from-file=config.json` 
 
 Аналогично с тестами: `flutter test --dart-define-from-file=config.json`
 К слову об автогенерации тестов: юнит-тестирование написано с помощью ChatGPT, рекомендую. Пример промпта:
