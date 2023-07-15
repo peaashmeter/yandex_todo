@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yandex_todo/core/data.dart';
 
+import 'core/themes.dart';
 import 'features/main/main_screen.dart';
 import 'core/persistence.dart' as persistence;
 import 'core/network.dart' as network;
@@ -27,17 +28,8 @@ class TodoApp extends StatelessWidget {
         return DataModel(
           notifier: model,
           child: MaterialApp(
-            theme: ThemeData(
-                primaryColor: Colors.blue,
-                appBarTheme: const AppBarTheme(
-                    color: Color(0xFFF7F6F2),
-                    titleTextStyle: TextStyle(color: Colors.black),
-                    foregroundColor: Colors.black),
-                textTheme: const TextTheme(
-                    labelLarge: TextStyle(
-                        color: Colors.black,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600))),
+            darkTheme: darkTheme,
+            theme: brightTheme,
             home: const MainScreen(),
           ),
         );

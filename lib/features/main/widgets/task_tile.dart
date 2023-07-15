@@ -42,6 +42,7 @@ class TaskTile extends StatelessWidget {
       ),
       key: ValueKey(id),
       child: ListTile(
+        tileColor: Theme.of(context).colorScheme.surface,
         leading: Checkbox(
             value: dataModel!.getTasks()[id]?.done,
             onChanged: (value) => _markAsCompleted(context)),

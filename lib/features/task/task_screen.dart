@@ -43,7 +43,8 @@ class _TaskScreenState extends State<TaskScreen> {
       },
       child: TaskModel(
         task: task,
-        child: const Scaffold(
+        child: Scaffold(
+          backgroundColor: Theme.of(context).colorScheme.background,
           body: CustomScrollView(
             slivers: [TaskAppBar(), TaskEditSliver()],
           ),
