@@ -45,8 +45,15 @@ class TaskTile extends StatelessWidget {
         leading: Checkbox(
             value: dataModel!.getTasks()[id]?.done,
             onChanged: (value) => _markAsCompleted(context)),
-        title: Text(task.text),
-        subtitle: Text(dataModel.getTasks()[id]?.deadline?.simpleString ?? ''),
+        isThreeLine: true,
+        title: Text(
+          task.text,
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: Text(
+          dataModel.getTasks()[id]?.deadline?.simpleString ?? '',
+        ),
         trailing: IconButton(
             onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => TaskScreen.edit(id),
