@@ -38,3 +38,6 @@ jobs:
         
       - name: Run tests
         run: flutter test
+        
+      - name: Start release build
+        run: flutter build appbundle
