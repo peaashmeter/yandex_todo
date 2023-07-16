@@ -40,4 +40,4 @@ jobs:
         run: flutter test test/offline_first_test.dart ; flutter test test/persistence_test.dart
         
       - name: Start release build
-        run: flutter build appbundle
+        run: flutter build appbundle --dart-define=token=${{secrets.TOKEN}}
