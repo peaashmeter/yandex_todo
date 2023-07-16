@@ -37,7 +37,7 @@ jobs:
         run: dart analyze
         
       - name: Run tests
-        run: flutter test
+        run: flutter test test/offline_first_test.dart ; flutter test test/persistence_test.dart
         
       - name: Start release build
         run: flutter build appbundle
