@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yandex_todo/core/data.dart';
+import 'package:yandex_todo/core/navigator.dart';
 import 'package:yandex_todo/features/task/task_model.dart';
-import 'package:yandex_todo/features/task/task_screen.dart';
 import 'package:yandex_todo/core/util.dart';
 
 class TaskTile extends StatelessWidget {
@@ -56,9 +56,7 @@ class TaskTile extends StatelessWidget {
           dataModel.getTasks()[id]?.deadline?.simpleString ?? '',
         ),
         trailing: IconButton(
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => TaskScreen.edit(id),
-                )),
+            onPressed: () => BetterNavigator.of(context).toExistingTask(id),
             icon: const Icon(Icons.info_outline_rounded)),
       ),
     );

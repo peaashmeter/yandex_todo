@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yandex_todo/features/task/task_screen.dart';
+import 'package:yandex_todo/core/navigator.dart';
 
 import 'state.dart';
 import 'widgets/scroll_view.dart';
@@ -16,14 +16,18 @@ class _MainScreenState extends State<MainScreen> {
   bool showCompleted = true;
 
   @override
+  void didChangeDependencies() {
+    BetterNavigator.of(context).setContext(context);
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => const TaskScreen(),
-          ));
+          BetterNavigator.of(context).toNewTask();
         },
         backgroundColor: Colors.blue,
         child: const Icon(

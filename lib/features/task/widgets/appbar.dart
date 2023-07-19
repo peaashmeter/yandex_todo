@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yandex_todo/core/data.dart';
+import 'package:yandex_todo/core/navigator.dart';
 import 'package:yandex_todo/features/task/task_model.dart';
 
 class TaskAppBar extends StatelessWidget {
@@ -15,7 +16,7 @@ class TaskAppBar extends StatelessWidget {
     assert(dataModel != null);
     return SliverAppBar(
       leading: IconButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => BetterNavigator.of(context).back(),
           icon: const Icon(Icons.close)),
       actions: [
         TextButton(
@@ -29,7 +30,7 @@ class TaskAppBar extends StatelessWidget {
                 dataModel!.editTask(task.id!, task);
               }
 
-              Navigator.pop(context);
+              BetterNavigator.of(context).back();
             },
             child: Text(
               'СОХРАНИТЬ',

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yandex_todo/core/data.dart';
+import 'package:yandex_todo/core/navigator.dart';
 
 import 'core/themes.dart';
 import 'features/main/main_screen.dart';
@@ -18,22 +19,24 @@ class TodoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = DataNotifier();
-    return FutureBuilder(
-      future: model.init(network.listTasks, persistence.readTasks),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return Center(child: CircularProgressIndicator());
-        }
+    return BetterNavigator(
+      child: FutureBuilder(
+        future: model.init(network.listTasks, persistence.readTasks),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Center(child: CircularProgressIndicator());
+          }
 
-        return DataModel(
-          notifier: model,
-          child: MaterialApp(
-            darkTheme: darkTheme,
-            theme: brightTheme,
-            home: const MainScreen(),
-          ),
-        );
-      },
+          return DataModel(
+            notifier: model,
+            child: MaterialApp(
+              darkTheme: darkTheme,
+              theme: brightTheme,
+              home: const MainScreen(),
+            ),
+          );
+        },
+      ),
     );
   }
 }
