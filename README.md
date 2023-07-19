@@ -4,7 +4,9 @@
 * Можно удалять задачи
 * Можно редактировать задачи
 * Задачи сохраняются на сервер и в файлик
+* Темы переключаются динамически при изменении системной темы
 * Написано на чистом Flutter без использования сторонних библиотек (ну почти).
+* Есть CI/CD: анализ, тесты, сборка. Тест бекэнда пришлось отключить, потому что с сервером периодически происходят странные вещи.
 
 Для запуска:
 1. создать файл `config.json` в корне проекта
@@ -30,7 +32,7 @@ Use '42' as id when needed.
 ```
 Важно объяснить нейросети про то, как работают Records, она про них еще не знает.
 
-Скачать apk можно [тут](https://github.com/peaashmeter/yandex_todo/releases/download/v1.2.0/app-release.apk).
+Скачать apk можно [тут](https://github.com/peaashmeter/yandex_todo/releases/download/v1.3.0/app-release.apk).
 
 | <img src="https://github.com/peaashmeter/yandex_todo/blob/main/screenshots/1.png" width="300">  |  <img src="https://github.com/peaashmeter/yandex_todo/blob/main/screenshots/2.png" width="300"> |
 |:-:|---|

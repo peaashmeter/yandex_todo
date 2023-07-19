@@ -75,11 +75,12 @@ class Task {
       bool? completed,
       String? id}) {
     return Task(
-        id: id == null ? this.id : id,
-        importance: importance ?? this.importance,
-        text: text ?? this.text,
-        done: completed ?? this.done,
-        deadline: due == null ? this.deadline : due);
+      id: id == null ? this.id : id,
+      importance: importance ?? this.importance,
+      text: text ?? this.text,
+      done: completed ?? this.done,
+      deadline: due,
+    );
   }
 
   String _getDeviceId() {

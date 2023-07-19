@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yandex_todo/core/data.dart';
+import 'package:yandex_todo/core/navigator.dart';
 
 import '../task_model.dart';
 
@@ -17,7 +18,7 @@ class DeleteButton extends StatelessWidget {
         onPressed: id == null
             ? null
             : () {
-                Navigator.pop(context);
+                BetterNavigator.of(context).back();
                 dataModel.removeTask(id);
               },
         icon: const Icon(

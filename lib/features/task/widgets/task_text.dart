@@ -20,9 +20,9 @@ class TaskTextField extends StatelessWidget {
         onChanged: (value) => _bubbleNotification(value, context),
         minLines: 5,
         maxLines: null,
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           filled: true,
-          fillColor: Colors.white,
+          fillColor: Theme.of(context).colorScheme.surface,
           border: OutlineInputBorder(
             borderSide: BorderSide.none,
           ),

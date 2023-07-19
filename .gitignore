@@ -45,3 +45,6 @@ app.*.map.json
 
 # токен от бэкенда
 config.json
+
+# dummy-данные тестов
+/test/data

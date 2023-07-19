@@ -1,0 +1,43 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Flutter
+
+on:
+  push:
+    branches: [ "main", "linus_torvalds" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: "12.x"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.10.5"
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyze project source
+        run: dart analyze
+        
+      - name: Run tests
+        run: flutter test test/offline_first_test.dart ; flutter test test/persistence_test.dart
+        
+      - name: Start release build
+        run: flutter build appbundle --dart-define=token=${{secrets.TOKEN}}
